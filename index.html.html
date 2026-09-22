@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SchemeSetu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans+Gurmukhi:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --blue:#1E5EFF;--blue-d:#1747C7;--blue-t:#1E5EFF;
+  --ink:#0F172A;--mute:#5B6778;--bg:#F8FAFC;--card:#FFFFFF;--tint:#EFF6FF;--line:#E2E8F0;
+  --ok:#15803D;--ok-bg:#DCFCE7;--warn:#B45309;--warn-bg:#FEF3C7;--err:#DC2626;--err-bg:#FEE2E2;
+  --orange:#F97316;--orange-btn:#C2410C;--orange-t:#FFF3E8;
+  --green:#16A34A;--green-btn:#15803D;--green-t:#EAF8EF;
+  --accent:var(--orange);--accent-btn:var(--orange-btn);--accent-t:var(--orange-t);
+  --map-bg:#E9EEF5;--map-road:#FFFFFF;--map-park:#D5EBD9;--map-river:#BFD8F5;--map-label:#64748B;
+  --shadow:0 4px 16px rgba(15,23,42,.06);
+  --font:'Inter','Noto Sans Devanagari','Noto Sans Gurmukhi',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --blue-t:#7FA3FF;--ink:#E6EDF7;--mute:#9AA8BD;--bg:#0B1220;--card:#111A2E;--tint:#15233F;--line:#25324B;
+    --ok:#4ADE80;--ok-bg:#12351F;--warn:#FBBF24;--warn-bg:#3A2A0A;--err:#F87171;--err-bg:#3B1416;
+    --orange-btn:#C2410C;--orange-t:#33200F;--green-t:#0F2A19;--shadow:0 4px 16px rgba(0,0,0,.3);
+    --map-bg:#16213A;--map-road:#22304F;--map-park:#15302A;--map-river:#1D3A63;--map-label:#8FA0BA;
+  }
+}
+:root[data-theme="dark"]{
+  --blue-t:#7FA3FF;--ink:#E6EDF7;--mute:#9AA8BD;--bg:#0B1220;--card:#111A2E;--tint:#15233F;--line:#25324B;
+  --ok:#4ADE80;--ok-bg:#12351F;--warn:#FBBF24;--warn-bg:#3A2A0A;--err:#F87171;--err-bg:#3B1416;
+  --orange-t:#33200F;--green-t:#0F2A19;--shadow:0 4px 16px rgba(0,0,0,.3);
+  --map-bg:#16213A;--map-road:#22304F;--map-park:#15302A;--map-river:#1D3A63;--map-label:#8FA0BA;
+}
+body[data-cat="agri"]{--accent:var(--green);--accent-btn:var(--green-btn);--accent-t:var(--green-t)}
+*{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 88px);height:100%}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,p{margin:0}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.15;font-weight:700;letter-spacing:-.02em}
+h2{font-size:clamp(24px,3.4vw,32px);line-height:1.2;font-weight:700;letter-spacing:-.01em}
+h3{font-size:20px;font-weight:650;line-height:1.3}
+h4{font-size:17px;font-weight:600;line-height:1.3}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--blue-t)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:8px}
+.ic{display:inline-flex;width:24px;height:24px;flex:none}
+.ic svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+.muted{color:var(--mute)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* header */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--card);border-bottom:1px solid var(--line)}
+.hd{display:flex;align-items:center;gap:20px;min-height:68px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:21px;color:var(--ink);text-decoration:none}
+.logo .ic{color:#fff;background:var(--blue);border-radius:10px;width:36px;height:36px;padding:7px}
+nav.main{display:flex;gap:4px;margin-left:12px}
+nav.main a{padding:10px 14px;border-radius:10px;text-decoration:none;color:var(--ink);font-weight:500}
+nav.main a:hover,nav.main a.on{background:var(--tint);color:var(--blue-t)}
+.hd .sp{flex:1}
+.lang{border:1.5px solid var(--line);background:var(--card);border-radius:12px;height:44px;padding:0 10px;font-weight:500}
+.burger{display:none;background:none;border:1.5px solid var(--line);border-radius:12px;width:44px;height:44px;align-items:center;justify-content:center;cursor:pointer;color:var(--ink)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 24px;border-radius:12px;border:2px solid transparent;font-weight:600;font-size:17px;cursor:pointer;text-decoration:none;transition:transform .12s,background .12s}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue-d)}
+.btn-accent{background:var(--accent-btn);color:#fff}.btn-accent:hover{filter:brightness(1.08)}
+.btn-ghost{background:var(--card);color:var(--blue-t);border-color:var(--blue)}
+.btn-ghost:hover{background:var(--tint)}
+.btn-sm{min-height:44px;padding:0 16px;font-size:15px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn-help{min-height:44px;padding:0 16px;font-size:15px}
+
+/* pages */
+.page{display:none}.page.on{display:block}
+main{min-height:60vh}
+section.blk{padding:56px 0}
+.crumb{font-size:14px;color:var(--mute);padding:20px 0 4px}
+.crumb a{color:var(--mute)}
+
+/* page 1 */
+.hero{background:linear-gradient(180deg,var(--tint),var(--bg));padding:56px 0 40px}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.pill{display:inline-block;background:var(--card);border:1px solid var(--line);color:var(--blue-t);padding:6px 14px;border-radius:999px;font-size:14px;font-weight:600;margin-bottom:18px}
+.hero p.sub{font-size:19px;color:var(--mute);margin:18px 0 28px;max-width:34em}
+.hero .cta{display:flex;gap:12px;flex-wrap:wrap}
+.cats{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:28px}
+.cat{background:var(--card);border:2px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);transition:transform .15s,border-color .15s;position:relative;display:flex;flex-direction:column}
+.cat:hover,.cat:focus-within{transform:translateY(-4px)}
+.cat.biz:hover,.cat.biz:focus-within,.cat.biz.sel{border-color:var(--orange)}
+.cat.agri:hover,.cat.agri:focus-within,.cat.agri.sel{border-color:var(--green)}
+.cat .top{padding:28px 28px 20px}
+.cat.biz .top{background:var(--orange-t)}.cat.agri .top{background:var(--green-t)}
+.cat .bigic{width:68px;height:68px;border-radius:18px;background:var(--card);display:grid;place-items:center;margin-bottom:16px}
+.cat.biz .bigic{color:var(--orange-btn)}.cat.agri .bigic{color:var(--green-btn)}
+.cat .bigic .ic{width:38px;height:38px}
+.cat .body{padding:20px 28px 28px;display:flex;flex-direction:column;gap:18px;flex:1}
+.cat .body p{color:var(--mute)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:14px;font-weight:500}
+.cat .btn{margin-top:auto}
+.cat .btn.b1{background:var(--orange-btn);color:#fff}.cat .btn.b2{background:var(--green-btn);color:#fff}
+.chk{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;color:#fff;display:none;place-items:center}
+.cat.biz .chk{background:var(--orange-btn)}.cat.agri .chk{background:var(--green-btn)}
+.cat.sel .chk{display:grid}
+.how{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:28px;position:relative}
+.how .st{text-align:center;position:relative}
+.how .st::before{content:"";position:absolute;top:26px;left:calc(50% + 34px);right:calc(-50% + 34px);height:2px;background:var(--line)}
+.how .st:last-child::before{display:none}
+.how .n{width:52px;height:52px;border-radius:50%;background:var(--card);border:2px solid var(--blue);color:var(--blue-t);display:grid;place-items:center;margin:0 auto 12px;position:relative;z-index:1;font-weight:700}
+.how b{display:block;font-weight:600}.how span.d{font-size:14px;color:var(--mute)}
+.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px}
+.trust div{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-weight:500;font-size:15px}
+.trust .ic{color:var(--blue-t)}
+.banner{background:var(--tint);border:1px solid var(--line);border-radius:20px;padding:28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* forms */
+.proto{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--mute);border:1px dashed var(--line);border-radius:12px;padding:8px 12px;margin:14px 0 0}
+.proto button{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:13px}
+.proto button:hover{border-color:var(--blue)}
+.seg{display:inline-flex;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:4px;gap:4px;margin:16px 0}
+.seg button{border:0;background:none;padding:10px 18px;border-radius:10px;font-weight:600;cursor:pointer;min-height:44px;display:flex;align-items:center;gap:8px}
+.seg button.on{color:#fff}
+.seg button[data-cat="biz"].on{background:var(--orange-btn)}
+.seg button[data-cat="agri"].on{background:var(--green-btn)}
+.prog{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 22px}
+.prog div{border-top:5px solid var(--line);padding-top:8px;font-size:14px;color:var(--mute);font-weight:500}
+.prog div.on{border-color:var(--accent);color:var(--ink);font-weight:600}
+.prog div.done{border-color:var(--accent)}
+.split{display:grid;grid-template-columns:65fr 35fr;gap:24px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:28px}
+.card+.card{margin-top:20px}
+.card h3{margin-bottom:18px}
+.fld{margin-bottom:22px}
+.fld>label,.lbl{display:block;font-weight:600;margin-bottom:8px}
+.inp{width:100%;min-height:52px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);padding:0 14px}
+.inp:focus{border-color:var(--blue);outline:3px solid rgba(30,94,255,.2)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mob{display:flex;gap:8px}
+.mob .pre{display:grid;place-items:center;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;background:var(--bg);font-weight:600}
+.mob .inp{flex:1}
+.link{background:none;border:0;color:var(--blue-t);font-weight:600;cursor:pointer;padding:0 6px;min-height:44px}
+.helper{font-size:14px;color:var(--mute);margin-top:6px}
+.rng{position:relative;padding:8px 0 26px}
+.rng input{width:100%;height:32px;accent-color:var(--accent)}
+.rng .lim{position:absolute;left:50%;top:0;transform:translateX(-50%);font-size:12px;color:var(--mute);text-align:center}
+.rng .lim::after{content:"";display:block;width:2px;height:38px;background:var(--mute);margin:2px auto 0;opacity:.5}
+.rng .ends{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;font-size:13px;color:var(--mute)}
+.rng .val{font-size:26px;font-weight:700;margin:14px 0 2px}
+.status{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;font-weight:600;font-size:15px}
+.status.ok{background:var(--ok-bg);color:var(--ok)}.status.bad{background:var(--err-bg);color:var(--err)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tiles.four{grid-template-columns:repeat(4,1fr)}
+.tile{border:2px solid var(--line);background:var(--card);border-radius:14px;padding:14px 8px;min-height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;text-align:center;font-weight:500;font-size:15px;line-height:1.3}
+.tile .ic{color:var(--mute);width:28px;height:28px}
+.tile:hover{border-color:var(--accent)}
+.tile.on{border-color:var(--accent);background:var(--accent-t);font-weight:600}
+.tile.on .ic{color:var(--accent-btn)}
+.tiles.four .tile{min-height:64px;flex-direction:row}
+.pills{display:flex;gap:10px;flex-wrap:wrap}
+.pillb{border:2px solid var(--line);background:var(--card);border-radius:999px;padding:0 20px;min-height:48px;cursor:pointer;font-weight:500}
+.pillb.on{border-color:var(--accent);background:var(--accent-t);font-weight:600}
+.money{position:relative}
+.money .rs{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-weight:600;color:var(--mute)}
+.money .inp{padding-left:32px;font-size:18px;font-weight:600}
+.stepper{display:inline-flex;align-items:center;border:1.5px solid var(--line);border-radius:12px;overflow:hidden}
+.stepper button{width:52px;height:52px;border:0;background:var(--bg);font-size:22px;cursor:pointer}
+.stepper output{min-width:56px;text-align:center;font-weight:700;font-size:18px}
+.preview{background:var(--accent-t);border:1.5px solid var(--accent);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:12px;font-weight:500;margin:6px 0 22px}
+.preview b{font-size:20px}
+.errtxt{color:var(--err);font-weight:600;font-size:14px;margin-top:8px;display:none}
+.errtxt.show{display:block}
+.inp.bad{border-color:var(--err)}
+.btns{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sticky{position:sticky;top:calc(env(safe-area-inset-top,0px) + 88px)}
+.why li{display:flex;gap:12px;margin-bottom:14px;list-style:none}
+.why ul{padding:0;margin:0}
+.why .ic{color:var(--blue-t);margin-top:2px}
+.note{display:flex;gap:10px;font-size:14px;color:var(--mute);border-top:1px solid var(--line);padding-top:16px;margin-top:8px}
+details.acc>summary{display:none}
+
+/* page 3 */
+.sumbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:16px 0 8px}
+.res{display:grid;grid-template-columns:60fr 40fr;gap:24px;align-items:start;padding-bottom:40px}
+.scheme{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:24px;margin-bottom:18px;position:relative;box-shadow:var(--shadow)}
+.scheme.best{border-color:var(--accent);padding-top:34px}
+.scheme.picked{outline:3px solid var(--accent);outline-offset:2px}
+.ribbon{position:absolute;top:-1px;left:22px;background:var(--accent-btn);color:#fff;font-weight:600;font-size:14px;padding:5px 14px;border-radius:0 0 10px 10px}
+.sh{display:flex;gap:16px;justify-content:space-between;align-items:flex-start}
+.ring{position:relative;width:76px;height:76px;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:18px}
+.info3{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:12px;margin:18px 0;overflow:hidden}
+.info3 div{padding:12px 14px}.info3 div+div{border-left:1px solid var(--line)}
+.info3 small{display:block;color:var(--mute);font-size:13px}.info3 b{font-size:18px}
+.elig{list-style:none;padding:0;margin:0 0 18px;display:grid;gap:8px}
+.elig li{display:flex;gap:10px;align-items:flex-start}
+.elig .ic{color:var(--ok);background:var(--ok-bg);border-radius:50%;padding:3px;width:24px;height:24px;margin-top:1px}
+.scheme.grey{background:var(--bg)}
+.grey .tagx{display:inline-block;background:var(--line);color:var(--mute);font-size:13px;font-weight:600;border-radius:999px;padding:3px 12px;margin-bottom:8px}
+.cmp{display:flex;gap:8px;align-items:center;font-size:15px;font-weight:500;cursor:pointer}
+.cmp input{width:22px;height:22px;accent-color:var(--blue)}
+.scr{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+.cmpbar{position:sticky;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);background:var(--ink);color:var(--bg);border-radius:14px;padding:12px 16px;display:none;justify-content:space-between;align-items:center;gap:12px;z-index:20}
+.cmpbar.show{display:flex}
+.emi{padding:24px}
+.emi .fld{margin-bottom:16px}
+.emi .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.emi input[type=range]{width:100%;height:30px;accent-color:var(--accent)}
+.emi .numin{width:150px;min-height:44px;text-align:right;font-weight:700;font-size:17px}
+.mors{display:flex;gap:8px}
+.mors button{flex:1;min-height:44px;border:2px solid var(--line);background:var(--card);border-radius:10px;font-weight:600;cursor:pointer}
+.mors button.on{border-color:var(--accent);background:var(--accent-t)}
+.big{background:var(--accent-t);border-radius:14px;padding:16px 18px;margin:18px 0 12px}
+.big small{color:var(--mute);display:block}.big b{font-size:34px;letter-spacing:-.02em}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.two div{border:1px solid var(--line);border-radius:12px;padding:10px 14px}.two small{color:var(--mute);display:block;font-size:13px}.two b{font-size:18px}
+.donutw{display:flex;align-items:center;gap:18px;margin:16px 0}
+.leg{display:grid;gap:8px;font-size:14px}.leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t th,table.t td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line)}
+table.t th:first-child,table.t td:first-child{text-align:left}
+table.t th{color:var(--mute);font-weight:600}
+.tscroll{overflow-x:auto}
+details.sch summary{cursor:pointer;font-weight:600;padding:10px 0;color:var(--blue-t)}
+.fab{display:none;position:fixed;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);z-index:30;box-shadow:0 8px 24px rgba(15,23,42,.3)}
+.sheetclose{display:none}
+.skel{height:200px;border-radius:18px;background:linear-gradient(90deg,var(--line),var(--tint),var(--line));background-size:200% 100%;animation:sh 1.3s linear infinite;margin-bottom:18px}
+@keyframes sh{to{background-position:-200% 0}}
+.notice{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:14px 16px;font-weight:600;margin-bottom:18px}
+.loadtxt{display:flex;align-items:center;gap:10px;font-weight:600;margin-bottom:16px}
+.spin{width:22px;height:22px;border:3px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* page 4 */
+.filters{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:18px 0}
+.filters .loc{display:flex;gap:8px;flex:1;min-width:260px}
+.fchip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:0 16px;min-height:44px;cursor:pointer;font-weight:500}
+.fchip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.locate{display:grid;grid-template-columns:45fr 55fr;gap:24px;align-items:start}
+.plist{display:grid;gap:14px;max-height:640px;overflow:auto;padding:4px 6px 4px 2px}
+.pc{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:8px}
+.pc.sel{border-color:var(--accent);box-shadow:var(--shadow)}
+.pc.bad{background:var(--bg);opacity:.85}
+.pc .ph{display:flex;gap:12px;align-items:flex-start}
+.num{flex:none;width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px}
+.pc.bad .num{background:var(--mute)}
+.pc .ph h4{flex:1}
+.pc .km{font-weight:700;white-space:nowrap}
+.tag{display:inline-block;background:var(--tint);color:var(--blue-t);border-radius:999px;padding:2px 10px;font-size:13px;font-weight:600;margin-top:4px}
+.pc p{font-size:15px;color:var(--mute)}
+.badge{display:inline-flex;gap:6px;align-items:center;border-radius:999px;padding:4px 12px;font-size:14px;font-weight:600;width:max-content}
+.badge.ok{background:var(--ok-bg);color:var(--ok)}.badge.warn{background:var(--warn-bg);color:var(--warn)}.badge.bad{background:var(--err-bg);color:var(--err)}
+.pc .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.mapbox{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--map-bg);aspect-ratio:6/5.2;min-height:340px}
+.mapz{position:absolute;inset:0;transform:scale(var(--z,1));transition:transform .25s}
+.mapz svg{width:100%;height:100%;display:block}
+.pin{position:absolute;transform:translate(-50%,-100%) scale(calc(1/var(--z,1)));transform-origin:50% 100%;border:0;background:none;padding:0;cursor:pointer;z-index:2}
+.pin span{display:grid;place-items:center;width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--blue);color:#fff;font-weight:700;border:2px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.3)}
+.pin span b{transform:rotate(45deg)}
+.pin.bad span{background:var(--mute)}
+.pin.sel{z-index:4}.pin.sel span{background:var(--accent-btn);width:46px;height:46px;font-size:18px}
+.you{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--blue);border:3px solid #fff;transform:translate(-50%,-50%) scale(calc(1/var(--z,1)));box-shadow:0 0 0 0 rgba(30,94,255,.5);animation:pu 2s infinite;z-index:3}
+@keyframes pu{70%{box-shadow:0 0 0 16px rgba(30,94,255,0)}100%{box-shadow:0 0 0 0 rgba(30,94,255,0)}}
+.pop{position:absolute;z-index:5;transform:translate(-50%,calc(-100% - 58px)) scale(calc(1/var(--z,1)));transform-origin:50% 100%;background:var(--card);color:var(--ink);border-radius:12px;padding:8px 12px;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,.25);white-space:nowrap;pointer-events:none}
+.pop b{display:block}
+.mctl{position:absolute;right:10px;top:10px;display:grid;gap:6px;z-index:6}
+.mctl button{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--card);font-size:20px;cursor:pointer}
+.mleg{position:absolute;left:10px;bottom:10px;z-index:6;background:var(--card);border-radius:10px;padding:6px 10px;font-size:12px;display:flex;gap:6px;align-items:center}
+.apply{margin-top:32px}
+.doc{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.doc input{width:24px;height:24px;accent-color:var(--accent)}
+.doc span.n{flex:1;font-weight:500}
+.up{font-size:13px;font-weight:600;border-radius:999px;padding:4px 12px}
+.up.y{background:var(--ok-bg);color:var(--ok)}.up.n{background:var(--warn-bg);color:var(--warn)}
+.bar{height:10px;background:var(--line);border-radius:999px;overflow:hidden;margin:6px 0 4px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .25s}
+.drop{border:2px dashed var(--line);border-radius:14px;padding:22px;text-align:center;color:var(--mute);cursor:pointer;margin-top:16px;background:var(--bg)}
+.drop.over,.drop:hover{border-color:var(--accent);background:var(--accent-t)}
+.trk{list-style:none;padding:0;margin:26px 0 0;display:grid;grid-template-columns:repeat(8,1fr)}
+.trk li{position:relative;text-align:center;padding:0 6px}
+.trk li:not(:last-child)::before{content:"";position:absolute;top:17px;left:50%;width:100%;height:4px;background:var(--line)}
+.trk li.done:not(:last-child)::before{background:var(--ok)}
+.trk .c{position:relative;z-index:1;margin:0 auto 10px;width:38px;height:38px;border-radius:50%;background:var(--line);color:var(--mute);display:grid;place-items:center;font-weight:700;font-size:15px}
+.trk li.done .c{background:var(--ok);color:#fff}
+.trk li.cur .c{background:var(--accent-btn);color:#fff;animation:pl 1.8s infinite}
+@keyframes pl{0%{box-shadow:0 0 0 0 rgba(249,115,22,.55)}80%,100%{box-shadow:0 0 0 14px rgba(249,115,22,0)}}
+body[data-cat="agri"] .trk li.cur .c{animation-name:plg}
+@keyframes plg{0%{box-shadow:0 0 0 0 rgba(22,163,74,.55)}80%,100%{box-shadow:0 0 0 14px rgba(22,163,74,0)}}
+.trk b{display:block;font-size:14px;line-height:1.3}
+.trk small{display:block;color:var(--mute);font-size:12.5px;margin-top:4px;line-height:1.35}
+.trk li.pend b{color:var(--mute)}
+.sms{max-width:360px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow)}
+.sms .from{font-size:12px;color:var(--mute);margin-bottom:6px;display:flex;justify-content:space-between}
+.sms p{background:var(--tint);border-radius:4px 14px 14px 14px;padding:10px 12px;font-size:15px}
+.mod{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:80;display:none;align-items:center;justify-content:center;padding:20px}
+.mod.show{display:flex}
+.mod .box{background:var(--card);border-radius:20px;padding:28px;max-width:640px;width:100%;max-height:88vh;overflow:auto;position:relative}
+.mod .x{position:absolute;top:12px;right:12px;width:44px;height:44px;border:0;background:none;cursor:pointer;color:var(--mute)}
+.okbig{width:76px;height:76px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;margin:0 auto 16px}
+.okbig .ic{width:42px;height:42px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 90px);transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:90;font-weight:500;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%)}
+footer{border-top:1px solid var(--line);background:var(--card);padding:32px 0;margin-top:40px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+footer nav{display:flex;gap:18px;flex-wrap:wrap}
+footer nav a{color:var(--mute);text-decoration:none}
+footer nav a:hover{text-decoration:underline}
+.cmpt td,.cmpt th{text-align:left!important;vertical-align:top;padding:10px}
+
+@media (max-width:960px){
+  nav.main{display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);border-bottom:1px solid var(--line);flex-direction:column;padding:10px 20px 16px;margin:0}
+  nav.main.open{display:flex}
+  .burger{display:flex}
+  .hero .wrap,.split,.res,.locate{grid-template-columns:1fr}
+  .hero .ill{order:-1;max-width:340px;margin:0 auto}
+  .cats{grid-template-columns:1fr}
+  .how{grid-template-columns:1fr 1fr;row-gap:24px}.how .st::before{display:none}
+  .trust{grid-template-columns:1fr 1fr}
+  .sticky{position:static}
+  details.acc>summary{display:block;cursor:pointer;font-weight:600;padding:4px 0}
+  details.acc .why-b{margin-top:12px}
+  .emi-panel{position:fixed;left:0;right:0;bottom:0;z-index:70;max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;transform:translateY(110%);transition:transform .3s;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 24px)}
+  .emi-panel.open{transform:none}
+  .fab{display:inline-flex}
+  .sheetclose{display:flex}
+  .trk{grid-template-columns:1fr}
+  .trk li{display:flex;gap:14px;text-align:left;padding:0 0 22px}
+  .trk li:not(:last-child)::before{top:38px;left:17px;width:4px;height:calc(100% - 38px)}
+  .trk .c{margin:0;flex:none}
+  .plist{max-height:none}
+  .hide-m{display:none}
+}
+@media (max-width:600px){
+  .row2,.tiles.four{grid-template-columns:1fr 1fr}
+  .tiles{grid-template-columns:1fr 1fr}
+  .info3{grid-template-columns:1fr}.info3 div+div{border-left:0;border-top:1px solid var(--line)}
+  .card{padding:20px}
+  .btn-help span.t{display:none}
+  .hd{gap:10px}
+  .logo{font-size:18px}
+  .lang{max-width:104px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body data-cat="biz">
+
+<header class="top">
+  <div class="wrap hd">
+    <a class="logo" href="#/1"><i class="ic" data-ic="bridge"></i>SchemeSetu</a>
+    <nav class="main" id="nav">
+      <a href="#/1" data-r="1"><span data-i="nav_home">Home</span></a>
+      <a href="#/3" data-r="3"><span data-i="nav_schemes">Schemes</span></a>
+      <a href="#/4" data-r="4"><span data-i="nav_partner">Find Partner</span></a>
+      <a href="#/4/track" data-r="4t"><span data-i="nav_track">Track Application</span></a>
+    </nav>
+    <span class="sp"></span>
+    <select class="lang" id="lang" aria-label="Language">
+      <option value="en">English</option><option value="hi">हिन्दी</option><option value="pa">ਪੰਜਾਬੀ</option>
+    </select>
+    <button class="btn btn-ghost btn-help" data-act="help"><i class="ic" data-ic="phone"></i><span class="t" data-i="help">Help</span></button>
+    <button class="burger" id="burger" aria-label="Menu"><i class="ic" data-ic="menu"></i></button>
+  </div>
+</header>
+
+<main>
+<!-- ============ PAGE 1 ============ -->
+<div class="page" id="p1">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="pill" data-i="hero_badge">Smart India Hackathon 2026</span>
+        <h1 data-i="hero_h1">Find the right loan scheme in 2 minutes</h1>
+        <p class="sub" data-i="hero_sub">Answer a few simple questions. We match you with government schemes offering up to 90% funding at 6.5% to 8% interest and show you the nearest bank or agency that can process it.</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#cats" data-act="scrollcats"><span data-i="get_started">Get started</span><i class="ic" data-ic="arrow"></i></a>
+          <a class="btn btn-ghost" href="#how"><span data-i="see_how">See how it works</span></a>
+        </div>
+      </div>
+      <div class="ill">
+        <svg viewBox="0 0 360 340" role="img" aria-label="Person holding a phone showing a scheme card and a map pin">
+          <ellipse cx="180" cy="312" rx="130" ry="14" fill="var(--line)"/>
+          <rect x="112" y="36" width="136" height="252" rx="22" fill="var(--ink)"/>
+          <rect x="120" y="50" width="120" height="224" rx="12" fill="var(--card)"/>
+          <rect x="130" y="62" width="100" height="58" rx="10" fill="#1E5EFF"/>
+          <rect x="138" y="72" width="52" height="8" rx="4" fill="#fff" opacity=".9"/>
+          <rect x="138" y="88" width="72" height="6" rx="3" fill="#fff" opacity=".6"/>
+          <rect x="138" y="100" width="40" height="10" rx="5" fill="#F97316"/>
+          <rect x="130" y="130" width="100" height="40" rx="10" fill="var(--green-t)" stroke="#16A34A"/>
+          <circle cx="146" cy="150" r="8" fill="#16A34A"/><path d="M142 150l3 3 6-6" stroke="#fff" stroke-width="2" fill="none"/>
+          <rect x="160" y="142" width="56" height="6" rx="3" fill="#16A34A"/><rect x="160" y="154" width="40" height="5" rx="2.5" fill="#16A34A" opacity=".5"/>
+          <rect x="130" y="180" width="100" height="84" rx="10" fill="var(--map-bg)"/>
+          <path d="M130 230c30-20 50 10 100-14" stroke="var(--map-river)" stroke-width="8" fill="none"/>
+          <path d="M180 214c-10-10-10-24 0-30 10 6 10 20 0 30z" fill="#F97316"/><circle cx="180" cy="196" r="4" fill="#fff"/>
+          <circle cx="56" cy="90" r="30" fill="#F97316" opacity=".15"/><circle cx="306" cy="200" r="38" fill="#16A34A" opacity=".15"/>
+          <g transform="translate(268 70)"><rect width="64" height="64" rx="16" fill="#F97316"/><path d="M18 26h28l-3 20H21zM24 26v-4a8 8 0 0 1 16 0v4" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+          <g transform="translate(28 190)"><rect width="64" height="64" rx="16" fill="#16A34A"/><path d="M32 46V26M32 30c0-8 6-12 14-12 0 8-6 12-14 12zM32 38c0-6-4-10-12-10 0 6 4 10 12 10z" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="blk" id="cats" style="padding-top:24px">
+    <div class="wrap">
+      <h2 data-i="choose_area">Choose your area</h2>
+      <p class="muted" style="margin-top:6px" data-i="choose_sub">Pick what describes your work best</p>
+      <div class="cats">
+        <article class="cat biz" id="catBiz">
+          <div class="chk"><i class="ic" data-ic="check"></i></div>
+          <div class="top"><div class="bigic"><i class="ic" data-ic="shop"></i></div><h2 data-i="biz_title">Business / Entrepreneur</h2></div>
+          <div class="body">
+            <p data-i="biz_desc">Shops, tailoring, food stalls, small manufacturing, transport, services</p>
+            <div class="chips"><span class="chip">Kirana store</span><span class="chip">Tailoring unit</span><span class="chip">E-rickshaw</span></div>
+            <button class="btn b1" data-act="pickcat" data-cat="biz"><span data-i="cont_biz">Continue as Entrepreneur</span><i class="ic" data-ic="arrow"></i></button>
+          </div>
+        </article>
+        <article class="cat agri" id="catAgri">
+          <div class="chk"><i class="ic" data-ic="check"></i></div>
+          <div class="top"><div class="bigic"><i class="ic" data-ic="tractor"></i></div><h2 data-i="agri_title">Agriculture &amp; Allied</h2></div>
+          <div class="body">
+            <p data-i="agri_desc">Dairy, poultry, goat farming, fisheries, farm tools and equipment</p>
+            <div class="chips"><span class="chip">Dairy</span><span class="chip">Poultry</span><span class="chip">Fisheries</span></div>
+            <button class="btn b2" data-act="pickcat" data-cat="agri"><span data-i="cont_agri">Continue as Farmer</span><i class="ic" data-ic="arrow"></i></button>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="blk" id="how" style="padding-top:8px">
+    <div class="wrap">
+      <div class="how">
+        <div class="st"><div class="n"><i class="ic" data-ic="user"></i></div><b data-i="how_1">Tell us about you</b><span class="d">2 min</span></div>
+        <div class="st"><div class="n"><i class="ic" data-ic="file"></i></div><b data-i="how_2">See matching schemes</b><span class="d">Best match + compare</span></div>
+        <div class="st"><div class="n"><i class="ic" data-ic="rupee"></i></div><b data-i="how_3">Calculate your EMI</b><span class="d">Live sliders</span></div>
+        <div class="st"><div class="n"><i class="ic" data-ic="pin"></i></div><b data-i="how_4">Find nearest partner</b><span class="d">Bank · Agency · NBFC-MFI</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="blk" style="padding:16px 0 24px">
+    <div class="wrap">
+      <div class="trust">
+        <div><i class="ic" data-ic="rupee"></i><span data-i="trust_1">Free to use</span></div>
+        <div><i class="ic" data-ic="globe"></i><span data-i="trust_2">Works in your language</span></div>
+        <div><i class="ic" data-ic="shield"></i><span data-i="trust_3">Only government schemes</span></div>
+        <div><i class="ic" data-ic="lock"></i><span data-i="trust_4">Your data stays private</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:8px 0 0">
+    <div class="wrap">
+      <div class="banner">
+        <h2 data-i="notsure">Not sure which scheme?</h2>
+        <button class="btn btn-primary" data-act="help"><i class="ic" data-ic="headset"></i><span data-i="helper">Talk to a helper</span></button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ PAGE 2 ============ -->
+<div class="page" id="p2">
+  <div class="wrap">
+    <div class="crumb"><a href="#/1" data-i="nav_home">Home</a> &gt; <span data-i="crumb_profile">Your profile</span></div>
+    <div class="proto"><span>Prototype states:</span>
+      <button data-act="fstate" data-s="empty">Empty</button><button data-act="fstate" data-s="filled">Filled</button><button data-act="fstate" data-s="error">Income error</button></div>
+    <div class="seg" role="tablist" aria-label="Category">
+      <button data-act="segcat" data-cat="biz" class="on"><i class="ic" data-ic="shop"></i><span data-i="biz_title">Business / Entrepreneur</span></button>
+      <button data-act="segcat" data-cat="agri"><i class="ic" data-ic="tractor"></i><span data-i="agri_title">Agriculture &amp; Allied</span></button>
+    </div>
+    <div class="prog" id="prog"></div>
+
+    <div class="split">
+      <div>
+        <div class="card">
+          <h3 data-i="sec_about">About you</h3>
+          <div class="fld"><label for="f_name" data-i="l_name">Full name</label><input class="inp" id="f_name" data-f="name" placeholder="e.g. Ramesh Kumar" autocomplete="name"></div>
+          <div class="fld"><label for="f_mob" data-i="l_mobile">Mobile number</label>
+            <div class="mob"><span class="pre">+91</span><input class="inp" id="f_mob" data-f="mobile" inputmode="numeric" maxlength="10" placeholder="10-digit number"><button class="link" data-act="otp">Send OTP</button></div></div>
+          <div class="row2">
+            <div class="fld"><label for="f_state" data-i="l_state">State</label><select class="inp" id="f_state" data-f="state"></select></div>
+            <div class="fld"><label for="f_dist" data-i="l_district">District</label><select class="inp" id="f_dist" data-f="district"></select></div>
+          </div>
+          <div class="fld">
+            <span class="lbl" data-i="l_income">Annual family income</span>
+            <div class="rng"><span class="lim">₹5 lakh</span>
+              <div class="val" id="incVal">₹3 lakh</div>
+              <input type="range" id="f_inc" min="0" max="10" step="0.25" value="3" aria-label="Annual family income in lakh rupees">
+              <div class="ends"><span>₹0</span><span>₹10 lakh</span></div></div>
+            <span class="status ok" id="incStatus" aria-live="polite"></span>
+            <div class="errtxt" id="incErr"></div>
+          </div>
+          <div class="fld" style="margin-bottom:0"><span class="lbl" data-i="l_edu">Education</span>
+            <div class="tiles four" id="eduTiles"></div></div>
+        </div>
+
+        <div class="card">
+          <h3 data-i="sec_req">Your requirement</h3>
+          <!-- business -->
+          <div class="only-biz">
+            <div class="fld"><span class="lbl" data-i="q_biz">What do you want to start or grow?</span><div class="tiles" id="tilesBiz"></div></div>
+            <div class="fld"><span class="lbl" data-i="q_newex">New or existing business?</span>
+              <div class="pills" id="pillsBiz"></div></div>
+          </div>
+          <!-- agri -->
+          <div class="only-agri">
+            <div class="fld"><span class="lbl" data-i="q_agri">What activity?</span><div class="tiles" id="tilesAgri"></div></div>
+            <div class="row2">
+              <div class="fld"><label for="f_land" data-i="l_land">Land size (acres)</label><input class="inp" id="f_land" data-f="land" inputmode="decimal" placeholder="e.g. 2"></div>
+              <div class="fld"><span class="lbl">&nbsp;</span><label class="cmp" style="min-height:52px"><input type="checkbox" id="f_noland"> <span data-i="l_noland">No land</span></label></div>
+            </div>
+            <div class="fld"><label for="f_exist" data-i="l_exist">Existing animals or equipment</label><input class="inp" id="f_exist" data-f="existing" placeholder="e.g. 2 buffaloes, 1 chaff cutter"></div>
+          </div>
+          <div class="fld"><label for="f_cost" data-i="l_cost">Estimated project cost (₹)</label>
+            <div class="money"><span class="rs">₹</span><input class="inp" id="f_cost" inputmode="numeric" placeholder="1,50,000"></div>
+            <div class="helper" id="costHelp">Example: 1,50,000</div>
+            <div class="errtxt" id="costErr">Enter your project cost to see matching schemes.</div></div>
+          <div class="only-biz fld" style="margin-bottom:8px"><span class="lbl" data-i="l_emp">Number of people you will employ</span>
+            <div class="stepper"><button data-act="emp" data-d="-1" aria-label="Fewer">−</button><output id="empVal">2</output><button data-act="emp" data-d="1" aria-label="More">+</button></div></div>
+
+          <div class="preview"><i class="ic" data-ic="rupee"></i><div><span data-i="prev_a">You may get up to</span> <b id="prevAmt">₹1,35,000</b> <span data-i="prev_b">(90% of your project cost)</span></div></div>
+          <div class="btns">
+            <a class="btn btn-ghost" href="#/1"><i class="ic" data-ic="back"></i><span data-i="back">Back</span></a>
+            <button class="btn btn-accent" data-act="find"><span data-i="find_schemes">Find my schemes</span><i class="ic" data-ic="arrow"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="sticky">
+        <details class="acc card" open id="whyAcc">
+          <summary data-i="why_title">Why we ask this</summary>
+          <div class="why-b why">
+            <h3 class="hide-m" data-i="why_title" style="margin-bottom:16px">Why we ask this</h3>
+            <ul>
+              <li><i class="ic" data-ic="rupee"></i><span data-i="why_1">Income decides your eligibility</span></li>
+              <li><i class="ic" data-ic="file"></i><span data-i="why_2">Project cost decides the loan size</span></li>
+              <li><i class="ic" data-ic="pin"></i><span data-i="why_3">Location helps us find the nearest partner</span></li>
+            </ul>
+            <div class="note"><i class="ic" data-ic="lock"></i><span data-i="privacy">Your details are used only to match schemes. We never share them without your consent.</span></div>
+          </div>
+        </details>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PAGE 3 ============ -->
+<div class="page" id="p3">
+  <div class="wrap">
+    <div class="crumb"><a href="#/1" data-i="nav_home">Home</a> &gt; <a href="#/2" data-i="crumb_profile">Your profile</a> &gt; <span data-i="nav_schemes">Schemes</span></div>
+    <div class="sumbar" id="sumbar"></div>
+    <div class="proto" style="margin-bottom:18px"><span>Prototype states:</span>
+      <button data-act="rstate" data-s="loading">Loading</button><button data-act="rstate" data-s="ok">Results</button><button data-act="rstate" data-s="empty">No exact match</button></div>
+    <div class="res">
+      <div>
+        <h2 style="margin-bottom:18px" data-i="schemes_for_you">Schemes matched for you</h2>
+        <div id="schemeList"></div>
+        <div class="cmpbar" id="cmpbar"><span id="cmpTxt"></span><button class="btn btn-primary btn-sm" data-act="opencmp">Compare</button></div>
+      </div>
+      <aside class="sticky">
+        <div class="card emi emi-panel" id="emiPanel">
+          <div class="top" style="margin-bottom:12px"><h3 style="margin:0" data-i="emi_title">EMI Calculator</h3>
+            <button class="link sheetclose" data-act="closeemi" aria-label="Close"><i class="ic" data-ic="x"></i></button></div>
+          <div class="fld"><div class="top"><label for="e_amt" data-i="loan_amt">Loan amount</label><input class="inp numin" id="e_amt" inputmode="numeric"></div>
+            <input type="range" id="e_amtR" aria-label="Loan amount"><div class="helper" id="e_cap"></div></div>
+          <div class="fld"><div class="top"><label for="e_rate" data-i="int_rate">Interest rate</label><b id="e_rateV">6.5% p.a.</b></div>
+            <input type="range" id="e_rate" min="6.5" max="15" step="0.5" value="6.5"></div>
+          <div class="fld"><div class="top"><label for="e_ten" data-i="tenure">Tenure</label><b id="e_tenV">3 years</b></div>
+            <input type="range" id="e_ten" min="1" max="10" step="1" value="3"></div>
+          <div class="fld"><span class="lbl" data-i="moratorium">Moratorium</span>
+            <div class="mors" id="mors"></div></div>
+          <div class="big"><small data-i="monthly_emi">Monthly EMI</small><b id="o_emi" aria-live="polite">₹0</b></div>
+          <div class="two"><div><small data-i="tot_int">Total interest</small><b id="o_int">₹0</b></div><div><small data-i="tot_pay">Total payable</small><b id="o_pay">₹0</b></div></div>
+          <div class="donutw">
+            <svg width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="Principal versus interest"><circle cx="60" cy="60" r="46" fill="none" stroke="var(--accent)" stroke-width="20"/><circle id="dnP" cx="60" cy="60" r="46" fill="none" stroke="#1E5EFF" stroke-width="20" stroke-dasharray="0 289" transform="rotate(-90 60 60)"/></svg>
+            <div class="leg"><div><i style="background:#1E5EFF"></i><span data-i="principal">Principal</span> <b id="l_p"></b></div><div><i style="background:var(--accent)"></i><span data-i="interest">Interest</span> <b id="l_i"></b></div></div>
+          </div>
+          <details class="sch"><summary data-i="sched">Repayment schedule</summary>
+            <div class="tscroll"><table class="t"><thead><tr><th>Month</th><th>EMI</th><th>Principal</th><th>Interest</th><th>Balance</th></tr></thead><tbody id="schedB"></tbody></table></div>
+            <div class="helper" id="morNote"></div></details>
+          <p class="helper" style="margin:12px 0 16px" data-i="est_note">Estimates only. Final terms are decided by the channel partner.</p>
+          <a class="btn btn-accent" style="width:100%" href="#/4" data-act="tofind"><span data-i="find_partner">Find nearest partner</span><i class="ic" data-ic="arrow"></i></a>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <button class="btn btn-primary fab" data-act="openemi"><i class="ic" data-ic="rupee"></i><span data-i="emi_title">EMI Calculator</span></button>
+</div>
+
+<!-- ============ PAGE 4 ============ -->
+<div class="page" id="p4">
+  <div class="wrap">
+    <div class="crumb"><a href="#/1" data-i="nav_home">Home</a> &gt; <a href="#/3" data-i="nav_schemes">Schemes</a> &gt; <span data-i="nav_partner">Find Partner</span></div>
+    <h2 id="p4h">Nearest partners for your Micro Finance Scheme</h2>
+    <div class="filters">
+      <div class="loc"><input class="inp" id="loc" value="Palwal, Haryana" aria-label="Location"><button class="btn btn-ghost btn-sm" data-act="locate"><i class="ic" data-ic="cross"></i><span>Use my location</span></button></div>
+      <select class="inp" id="distSel" style="width:auto" aria-label="Distance"><option value="5">5 km</option><option value="10">10 km</option><option value="25" selected>25 km</option><option value="50">50 km</option></select>
+    </div>
+    <div class="chips" id="ptypes" style="margin-bottom:18px"></div>
+    <div class="muted" style="margin-bottom:10px;font-size:14px" id="pcount"></div>
+    <div class="locate">
+      <div class="plist" id="plist"></div>
+      <div class="mapbox" id="mapbox">
+        <div class="mapz" id="mapz" style="--z:1">
+          <svg viewBox="0 0 600 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <rect width="600" height="500" fill="var(--map-bg)"/>
+            <path d="M-20 370C120 330 200 420 330 380S520 300 640 340V520H-20Z" fill="var(--map-park)" opacity=".7"/>
+            <rect x="60" y="60" width="90" height="60" rx="10" fill="var(--map-park)"/><rect x="430" y="380" width="110" height="70" rx="10" fill="var(--map-park)"/>
+            <path d="M-20 180C90 210 160 120 280 160S470 240 640 170" fill="none" stroke="var(--map-river)" stroke-width="26" stroke-linecap="round"/>
+            <g stroke="var(--map-road)" fill="none" stroke-linecap="round">
+              <path d="M0 260H600" stroke-width="14"/><path d="M290 0V500" stroke-width="14"/><path d="M0 60L600 440" stroke-width="10"/>
+              <path d="M0 420H600M140 0V500M450 0V500M0 130H600" stroke-width="5"/><path d="M200 0L420 500M520 0L380 500" stroke-width="4"/>
+            </g>
+            <g fill="var(--map-label)" font-size="13" font-weight="600" font-family="Inter,sans-serif"><text x="304" y="20">NH-19</text><text x="470" y="255">Hodal Road</text><text x="30" y="255">Old Bus Stand</text><text x="70" y="102">Nehru Park</text><text x="440" y="422">Mandi</text></g>
+          </svg>
+          <div id="pins"></div>
+        </div>
+        <div class="mctl"><button data-act="zoom" data-d="1" aria-label="Zoom in">+</button><button data-act="zoom" data-d="-1" aria-label="Zoom out">−</button></div>
+        <div class="mleg"><i style="width:12px;height:12px;border-radius:50%;background:var(--blue);display:inline-block"></i> You</div>
+      </div>
+    </div>
+
+    <section class="apply card" id="applyPanel" style="display:none"></section>
+
+    <section class="blk" id="tracker" style="padding-bottom:0">
+      <div class="split" style="grid-template-columns:70fr 30fr">
+        <div class="card">
+          <h2 style="font-size:24px" data-i="track_title">Track your application</h2>
+          <ol class="trk" id="trk"></ol>
+        </div>
+        <div>
+          <div class="card"><h3 data-i="need_help">Need help?</h3>
+            <p class="muted" style="margin-bottom:14px" data-i="help_txt">Talk to a SchemeSetu helper in your language.</p>
+            <p style="font-size:22px;font-weight:700;margin-bottom:14px">1800-000-0000</p>
+            <button class="btn btn-ghost" style="width:100%" data-act="chat"><i class="ic" data-ic="msg"></i><span data-i="chat">Chat with us</span></button></div>
+          <div class="card"><h3 style="font-size:17px" data-i="sms_title">SMS you will receive</h3>
+            <div class="sms"><div class="from"><span>SCHEME-SETU</span><span>21 Sep, 10:42</span></div><p id="smsTxt"></p></div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b data-i="foot_tag">Bridging the gap between people and opportunities</b><div class="muted" style="font-size:14px;margin-top:4px" data-i="foot_sample">Sample data for prototype only</div></div>
+    <nav><a href="#/1">About</a><a href="#/1">Privacy</a><a href="#/1">Accessibility</a><a href="#/1">Contact</a></nav>
+  </div>
+</footer>
+
+<div class="mod" id="mod"><div class="box" role="dialog" aria-modal="true"><button class="x" data-act="closemod" aria-label="Close"><i class="ic" data-ic="x"></i></button><div id="modBody"></div></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const P={
+shop:'<path d="M3 9l1.5-5h15L21 9M3 9h18M3 9v11h18V9M9 20v-6h6v6"/>',
+tractor:'<circle cx="6.5" cy="16.5" r="3.5"/><circle cx="18" cy="17.5" r="2.5"/><path d="M3 13V7h6l2 4h5l2 4M9 7V4h4"/>',
+check:'<path d="M20 6L9 17l-5-5"/>',arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',back:'<path d="M19 12H5M11 6l-6 6 6 6"/>',
+phone:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>',
+pin:'<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
+lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+headset:'<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/><path d="M20 20c0 1.5-2 2-5 2"/>',
+menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+rupee:'<path d="M6 4h12M6 9h12M6 4c6 0 8 2 8 5s-2 5-8 5l7 6"/>',
+file:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+upload:'<path d="M12 16V4M6 10l6-6 6 6M4 20h16"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',
+scissors:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8 8l12 12M8 16L20 4"/>',
+utensils:'<path d="M5 3v8a2 2 0 0 0 2 2v8M9 3v8M7 3v8M17 3c-2 2-3 5-3 8h3v10"/>',
+zap:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',wrench:'<path d="M14.7 6.3a4 4 0 0 0 5 5l-9.4 9.4a2.1 2.1 0 0 1-3-3z"/><path d="M14.7 6.3a4 4 0 0 1 5-1l-2.5 2.5 1 2.2"/>',
+plus:'<path d="M12 5v14M5 12h14"/>',milk:'<path d="M9 2h6M10 2v4l-2 3v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V9l-2-3V2M8 13h8"/>',
+bird:'<path d="M16 7h.01M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.3-2.2z"/><path d="M20 7l2 1-2 1"/>',
+sheep:'<path d="M7 18a4 4 0 0 1-.5-8A5 5 0 0 1 16 8a4.5 4.5 0 0 1 1 10z"/><path d="M8 18v3M15 18v3"/>',
+fish:'<path d="M6.5 12c3-5 8-6 12-4-1 3-1 5 0 8-4 2-9 1-12-4z"/><path d="M6.5 12L2 8v8z"/><path d="M16 11h.01"/>',
+nav:'<path d="M3 11l19-9-9 19-2-8z"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+alert:'<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>',download:'<path d="M12 4v12M6 10l6 6 6-6M4 20h16"/>',
+msg:'<path d="M21 12a8 8 0 0 1-11.5 7.2L3 21l1.8-5.5A8 8 0 1 1 21 12z"/>',cross:'<circle cx="12" cy="12" r="7"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>',
+bridge:'<path d="M2 19h20M4 19V9M20 19V9M4 9c4 0 4 6 8 6s4-6 8-6"/>',edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/>',grad:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/>'
+};
+const ic=n=>`<svg viewBox="0 0 24 24" aria-hidden="true">${P[n]||''}</svg>`;
+const paintIcons=(root=document)=>root.querySelectorAll('[data-ic]').forEach(e=>{if(!e.innerHTML)e.innerHTML=ic(e.dataset.ic)});
+const ind=n=>Math.round(n).toLocaleString('en-IN');
+const fmt=n=>'₹'+ind(n);
+const fmtL=n=>{if(n<100000)return fmt(n);const v=n/100000;return '₹'+(Number.isInteger(v)?v:v.toFixed(2))+' lakh'};
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),2600)}
+
+/* ---------- i18n ---------- */
+const I={
+nav_home:['Home','होम','ਹੋਮ'],nav_schemes:['Schemes','योजनाएँ','ਯੋਜਨਾਵਾਂ'],nav_partner:['Find Partner','पार्टनर खोजें','ਪਾਰਟਨਰ ਲੱਭੋ'],nav_track:['Track Application','आवेदन ट्रैक करें','ਅਰਜ਼ੀ ਟ੍ਰੈਕ ਕਰੋ'],help:['Help','मदद','ਮਦਦ'],
+foot_tag:['Bridging the gap between people and opportunities','लोगों और अवसरों के बीच की दूरी मिटाते हुए','ਲੋਕਾਂ ਅਤੇ ਮੌਕਿਆਂ ਵਿਚਕਾਰ ਪੁਲ ਬਣਾਉਂਦੇ ਹੋਏ'],foot_sample:['Sample data for prototype only','केवल प्रोटोटाइप के लिए नमूना डेटा','ਸਿਰਫ਼ ਪ੍ਰੋਟੋਟਾਈਪ ਲਈ ਨਮੂਨਾ ਡਾਟਾ'],
+hero_badge:['Smart India Hackathon 2026','स्मार्ट इंडिया हैकाथॉन 2026','ਸਮਾਰਟ ਇੰਡੀਆ ਹੈਕਾਥਾਨ 2026'],
+hero_h1:['Find the right loan scheme in 2 minutes','2 मिनट में सही लोन योजना खोजें','2 ਮਿੰਟ ਵਿੱਚ ਸਹੀ ਲੋਨ ਯੋਜਨਾ ਲੱਭੋ'],
+hero_sub:['Answer a few simple questions. We match you with government schemes offering up to 90% funding at 6.5% to 8% interest and show you the nearest bank or agency that can process it.','कुछ आसान सवालों के जवाब दीजिए। हम आपको ऐसी सरकारी योजनाओं से मिलाते हैं जिनमें 6.5% से 8% ब्याज पर 90% तक फंडिंग मिलती है, और नज़दीकी बैंक या एजेंसी भी बताते हैं।','ਕੁਝ ਸੌਖੇ ਸਵਾਲਾਂ ਦੇ ਜਵਾਬ ਦਿਓ। ਅਸੀਂ ਤੁਹਾਨੂੰ ਅਜਿਹੀਆਂ ਸਰਕਾਰੀ ਯੋਜਨਾਵਾਂ ਨਾਲ ਮਿਲਾਉਂਦੇ ਹਾਂ ਜਿਨ੍ਹਾਂ ਵਿੱਚ 6.5% ਤੋਂ 8% ਵਿਆਜ \'ਤੇ 90% ਤੱਕ ਫੰਡਿੰਗ ਮਿਲਦੀ ਹੈ, ਅਤੇ ਨੇੜਲਾ ਬੈਂਕ ਜਾਂ ਏਜੰਸੀ ਵੀ ਦੱਸਦੇ ਹਾਂ।'],
+get_started:['Get started','शुरू करें','ਸ਼ੁਰੂ ਕਰੋ'],see_how:['See how it works','यह कैसे काम करता है','ਇਹ ਕਿਵੇਂ ਕੰਮ ਕਰਦਾ ਹੈ'],
+choose_area:['Choose your area','अपना क्षेत्र चुनें','ਆਪਣਾ ਖੇਤਰ ਚੁਣੋ'],choose_sub:['Pick what describes your work best','जो आपके काम को सबसे अच्छा बताए वह चुनें','ਜੋ ਤੁਹਾਡੇ ਕੰਮ ਨੂੰ ਸਭ ਤੋਂ ਵਧੀਆ ਦੱਸੇ ਉਹ ਚੁਣੋ'],
+biz_title:['Business / Entrepreneur','व्यापार / उद्यमी','ਵਪਾਰ / ਉੱਦਮੀ'],biz_desc:['Shops, tailoring, food stalls, small manufacturing, transport, services','दुकान, सिलाई, खाने का ठेला, छोटा उत्पादन, परिवहन, सेवाएँ','ਦੁਕਾਨ, ਸਿਲਾਈ, ਖਾਣ-ਪੀਣ ਦੀ ਰੇਹੜੀ, ਛੋਟਾ ਉਤਪਾਦਨ, ਟਰਾਂਸਪੋਰਟ, ਸੇਵਾਵਾਂ'],
+agri_title:['Agriculture & Allied','कृषि और संबद्ध कार्य','ਖੇਤੀਬਾੜੀ ਅਤੇ ਸਹਾਇਕ ਧੰਦੇ'],agri_desc:['Dairy, poultry, goat farming, fisheries, farm tools and equipment','डेयरी, मुर्गी पालन, बकरी पालन, मछली पालन, कृषि औज़ार','ਡੇਅਰੀ, ਮੁਰਗੀ ਪਾਲਣ, ਬੱਕਰੀ ਪਾਲਣ, ਮੱਛੀ ਪਾਲਣ, ਖੇਤੀ ਸੰਦ'],
+cont_biz:['Continue as Entrepreneur','उद्यमी के रूप में आगे बढ़ें','ਉੱਦਮੀ ਵਜੋਂ ਅੱਗੇ ਵਧੋ'],cont_agri:['Continue as Farmer','किसान के रूप में आगे बढ़ें','ਕਿਸਾਨ ਵਜੋਂ ਅੱਗੇ ਵਧੋ'],
+how_1:['Tell us about you','अपने बारे में बताएँ','ਆਪਣੇ ਬਾਰੇ ਦੱਸੋ'],how_2:['See matching schemes','मेल खाती योजनाएँ देखें','ਮੇਲ ਖਾਂਦੀਆਂ ਯੋਜਨਾਵਾਂ ਵੇਖੋ'],how_3:['Calculate your EMI','अपनी EMI निकालें','ਆਪਣੀ EMI ਕੱਢੋ'],how_4:['Find nearest partner','नज़दीकी पार्टनर खोजें','ਨੇੜਲਾ ਪਾਰਟਨਰ ਲੱਭੋ'],
+trust_1:['Free to use','उपयोग मुफ़्त','ਵਰਤੋਂ ਮੁਫ਼ਤ'],trust_2:['Works in your language','आपकी भाषा में','ਤੁਹਾਡੀ ਭਾਸ਼ਾ ਵਿੱਚ'],trust_3:['Only government schemes','सिर्फ़ सरकारी योजनाएँ','ਸਿਰਫ਼ ਸਰਕਾਰੀ ਯੋਜਨਾਵਾਂ'],trust_4:['Your data stays private','आपका डेटा सुरक्षित','ਤੁਹਾਡਾ ਡਾਟਾ ਸੁਰੱਖਿਅਤ'],
+notsure:['Not sure which scheme?','पता नहीं कौन-सी योजना?','ਪਤਾ ਨਹੀਂ ਕਿਹੜੀ ਯੋਜਨਾ?'],helper:['Talk to a helper','सहायक से बात करें','ਸਹਾਇਕ ਨਾਲ ਗੱਲ ਕਰੋ'],
+crumb_profile:['Your profile','आपकी प्रोफ़ाइल','ਤੁਹਾਡੀ ਪ੍ਰੋਫ਼ਾਈਲ'],sec_about:['About you','आपके बारे में','ਤੁਹਾਡੇ ਬਾਰੇ'],sec_req:['Your requirement','आपकी ज़रूरत','ਤੁਹਾਡੀ ਲੋੜ'],
+l_name:['Full name','पूरा नाम','ਪੂਰਾ ਨਾਮ'],l_mobile:['Mobile number','मोबाइल नंबर','ਮੋਬਾਈਲ ਨੰਬਰ'],l_state:['State','राज्य','ਰਾਜ'],l_district:['District','ज़िला','ਜ਼ਿਲ੍ਹਾ'],
+l_income:['Annual family income','परिवार की सालाना आय','ਪਰਿਵਾਰ ਦੀ ਸਾਲਾਨਾ ਆਮਦਨ'],inc_ok:['Eligible: income up to ₹5 lakh','पात्र: आय ₹5 लाख तक','ਯੋਗ: ਆਮਦਨ ₹5 ਲੱਖ ਤੱਕ'],inc_bad:['Above the limit for these schemes','इन योजनाओं की सीमा से ऊपर','ਇਨ੍ਹਾਂ ਯੋਜਨਾਵਾਂ ਦੀ ਸੀਮਾ ਤੋਂ ਉੱਪਰ'],
+inc_err:['Family income above ₹5 lakh is not eligible. Lower the income or ask a helper.','₹5 लाख से अधिक पारिवारिक आय पात्र नहीं है। आय सही करें या सहायक से पूछें।','₹5 ਲੱਖ ਤੋਂ ਵੱਧ ਪਰਿਵਾਰਕ ਆਮਦਨ ਯੋਗ ਨਹੀਂ ਹੈ। ਆਮਦਨ ਠੀਕ ਕਰੋ ਜਾਂ ਸਹਾਇਕ ਨੂੰ ਪੁੱਛੋ।'],
+l_edu:['Education','पढ़ाई','ਪੜ੍ਹਾਈ'],e1:['Below 10th','10वीं से कम','10ਵੀਂ ਤੋਂ ਘੱਟ'],e2:['10th–12th','10वीं–12वीं','10ਵੀਂ–12ਵੀਂ'],e3:['Graduate','स्नातक','ਗ੍ਰੈਜੂਏਟ'],e4:['Post-graduate','परास्नातक','ਪੋਸਟ-ਗ੍ਰੈਜੂਏਟ'],
+q_biz:['What do you want to start or grow?','आप क्या शुरू या बढ़ाना चाहते हैं?','ਤੁਸੀਂ ਕੀ ਸ਼ੁਰੂ ਜਾਂ ਵਧਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?'],q_newex:['New or existing business?','नया या पुराना काम?','ਨਵਾਂ ਜਾਂ ਪੁਰਾਣਾ ਕੰਮ?'],q_agri:['What activity?','कौन-सा काम?','ਕਿਹੜਾ ਕੰਮ?'],
+l_land:['Land size (acres)','ज़मीन (एकड़)','ਜ਼ਮੀਨ (ਏਕੜ)'],l_noland:['No land','ज़मीन नहीं है','ਜ਼ਮੀਨ ਨਹੀਂ ਹੈ'],l_exist:['Existing animals or equipment','मौजूदा पशु या उपकरण','ਮੌਜੂਦਾ ਪਸ਼ੂ ਜਾਂ ਸਾਮਾਨ'],
+l_cost:['Estimated project cost (₹)','अनुमानित परियोजना लागत (₹)','ਅਨੁਮਾਨਿਤ ਪ੍ਰੋਜੈਕਟ ਲਾਗਤ (₹)'],l_emp:['Number of people you will employ','कितने लोगों को काम देंगे','ਕਿੰਨੇ ਲੋਕਾਂ ਨੂੰ ਕੰਮ ਦਿਓਗੇ'],
+prev_a:['You may get up to','आप अधिकतम पा सकते हैं','ਤੁਹਾਨੂੰ ਵੱਧ ਤੋਂ ਵੱਧ ਮਿਲ ਸਕਦਾ ਹੈ'],prev_b:['(90% of your project cost)','(परियोजना लागत का 90%)','(ਪ੍ਰੋਜੈਕਟ ਲਾਗਤ ਦਾ 90%)'],
+back:['Back','वापस','ਵਾਪਸ'],find_schemes:['Find my schemes','मेरी योजनाएँ खोजें','ਮੇਰੀਆਂ ਯੋਜਨਾਵਾਂ ਲੱਭੋ'],
+why_title:['Why we ask this','हम यह क्यों पूछते हैं','ਅਸੀਂ ਇਹ ਕਿਉਂ ਪੁੱਛਦੇ ਹਾਂ'],why_1:['Income decides your eligibility','आय से पात्रता तय होती है','ਆਮਦਨ ਨਾਲ ਯੋਗਤਾ ਤੈਅ ਹੁੰਦੀ ਹੈ'],why_2:['Project cost decides the loan size','परियोजना लागत से लोन की राशि तय होती है','ਪ੍ਰੋਜੈਕਟ ਲਾਗਤ ਨਾਲ ਲੋਨ ਦੀ ਰਕਮ ਤੈਅ ਹੁੰਦੀ ਹੈ'],why_3:['Location helps us find the nearest partner','जगह से नज़दीकी पार्टनर ढूँढ़ते हैं','ਥਾਂ ਨਾਲ ਅਸੀਂ ਨੇੜਲਾ ਪਾਰਟਨਰ ਲੱਭਦੇ ਹਾਂ'],
+privacy:['Your details are used only to match schemes. We never share them without your consent.','आपकी जानकारी सिर्फ़ योजनाएँ मिलाने के लिए है। आपकी सहमति के बिना साझा नहीं की जाती।','ਤੁਹਾਡੀ ਜਾਣਕਾਰੀ ਸਿਰਫ਼ ਯੋਜਨਾਵਾਂ ਮਿਲਾਉਣ ਲਈ ਹੈ। ਤੁਹਾਡੀ ਸਹਿਮਤੀ ਤੋਂ ਬਿਨਾਂ ਸਾਂਝੀ ਨਹੀਂ ਕੀਤੀ ਜਾਂਦੀ।'],
+schemes_for_you:['Schemes matched for you','आपके लिए चुनी गई योजनाएँ','ਤੁਹਾਡੇ ਲਈ ਚੁਣੀਆਂ ਯੋਜਨਾਵਾਂ'],best_match:['Best match','सबसे बेहतर','ਸਭ ਤੋਂ ਵਧੀਆ'],why_elig:['Why you are eligible','आप पात्र क्यों हैं','ਤੁਸੀਂ ਯੋਗ ਕਿਉਂ ਹੋ'],
+use_scheme:['Use this scheme','यह योजना चुनें','ਇਹ ਯੋਜਨਾ ਚੁਣੋ'],view_details:['View details','विवरण देखें','ਵੇਰਵਾ ਵੇਖੋ'],max_loan:['Max loan','अधिकतम लोन','ਵੱਧ ਤੋਂ ਵੱਧ ਲੋਨ'],interest:['Interest','ब्याज','ਵਿਆਜ'],
+emi_title:['EMI Calculator','EMI कैलकुलेटर','EMI ਕੈਲਕੁਲੇਟਰ'],monthly_emi:['Monthly EMI','मासिक EMI','ਮਹੀਨਾਵਾਰ EMI'],tot_int:['Total interest','कुल ब्याज','ਕੁੱਲ ਵਿਆਜ'],tot_pay:['Total payable','कुल भुगतान','ਕੁੱਲ ਅਦਾਇਗੀ'],
+loan_amt:['Loan amount','लोन राशि','ਲੋਨ ਦੀ ਰਕਮ'],int_rate:['Interest rate','ब्याज दर','ਵਿਆਜ ਦਰ'],tenure:['Tenure','अवधि','ਮਿਆਦ'],moratorium:['Moratorium (grace period)','मोरेटोरियम (राहत अवधि)','ਮੋਰੇਟੋਰੀਅਮ (ਰਾਹਤ ਮਿਆਦ)'],
+principal:['Principal','मूलधन','ਮੂਲ ਰਕਮ'],sched:['Repayment schedule','किस्तों की तालिका','ਕਿਸ਼ਤਾਂ ਦੀ ਸਾਰਣੀ'],est_note:['Estimates only. Final terms are decided by the channel partner.','केवल अनुमान। अंतिम शर्तें चैनल पार्टनर तय करता है।','ਸਿਰਫ਼ ਅਨੁਮਾਨ। ਅੰਤਿਮ ਸ਼ਰਤਾਂ ਚੈਨਲ ਪਾਰਟਨਰ ਤੈਅ ਕਰਦਾ ਹੈ।'],find_partner:['Find nearest partner','नज़दीकी पार्टनर खोजें','ਨੇੜਲਾ ਪਾਰਟਨਰ ਲੱਭੋ'],
+docs_title:['Documents to keep ready','ज़रूरी दस्तावेज़ तैयार रखें','ਲੋੜੀਂਦੇ ਦਸਤਾਵੇਜ਼ ਤਿਆਰ ਰੱਖੋ'],submit_app:['Submit application','आवेदन जमा करें','ਅਰਜ਼ੀ ਜਮ੍ਹਾਂ ਕਰੋ'],
+track_title:['Track your application','अपना आवेदन ट्रैक करें','ਆਪਣੀ ਅਰਜ਼ੀ ਟ੍ਰੈਕ ਕਰੋ'],need_help:['Need help?','मदद चाहिए?','ਮਦਦ ਚਾਹੀਦੀ ਹੈ?'],help_txt:['Talk to a SchemeSetu helper in your language.','अपनी भाषा में SchemeSetu सहायक से बात करें।','ਆਪਣੀ ਭਾਸ਼ਾ ਵਿੱਚ SchemeSetu ਸਹਾਇਕ ਨਾਲ ਗੱਲ ਕਰੋ।'],chat:['Chat with us','हमसे चैट करें','ਸਾਡੇ ਨਾਲ ਚੈਟ ਕਰੋ'],sms_title:['SMS you will receive','आपको मिलने वाला SMS','ਤੁਹਾਨੂੰ ਮਿਲਣ ਵਾਲਾ SMS'],
+funds:['Funds available','फंड उपलब्ध','ਫੰਡ ਉਪਲਬਧ'],limited:['Limited funds','सीमित फंड','ਸੀਮਤ ਫੰਡ'],overdue:['High overdue, not recommended','ज़्यादा बकाया, अनुशंसित नहीं','ਵੱਧ ਬਕਾਇਆ, ਸਿਫ਼ਾਰਸ਼ ਨਹੀਂ'],
+directions:['Get directions','रास्ता देखें','ਰਸਤਾ ਵੇਖੋ'],select:['Select','चुनें','ਚੁਣੋ'],
+tr1:['Registered','पंजीकृत','ਰਜਿਸਟਰ ਹੋਇਆ'],tr2:['Eligibility checked','पात्रता जाँची गई','ਯੋਗਤਾ ਜਾਂਚੀ ਗਈ'],tr3:['Scheme selected','योजना चुनी गई','ਯੋਜਨਾ ਚੁਣੀ ਗਈ'],tr4:['Loan estimated','लोन का अनुमान','ਲੋਨ ਦਾ ਅਨੁਮਾਨ'],tr5:['Partner selected','पार्टनर चुना गया','ਪਾਰਟਨਰ ਚੁਣਿਆ ਗਿਆ'],tr6:['Application submitted','आवेदन जमा','ਅਰਜ਼ੀ ਜਮ੍ਹਾਂ'],tr7:['Under verification','जाँच जारी','ਜਾਂਚ ਜਾਰੀ'],tr8:['Sanctioned and disbursed','मंज़ूर और वितरित','ਮਨਜ਼ੂਰ ਅਤੇ ਵੰਡਿਆ ਗਿਆ']
+};
+let lang=0;const LI={en:0,hi:1,pa:2};
+const t=k=>(I[k]&&I[k][lang])||(I[k]&&I[k][0])||k;
+function applyI18n(){
+  document.documentElement.lang=['en','hi','pa'][lang];
+  $$('[data-i]').forEach(e=>{e.textContent=t(e.dataset.i)});
+}
+
+/* ---------- data ---------- */
+const SC={
+ micro:{n:'Micro Finance Scheme',cap:140000,rate:6.5,mor:3,ten:'Up to 3 years',tenY:3,step:5000,desc:'Small loans for tools, stock and everyday working needs.',docs:'Aadhaar, caste and income certificate, short project note',ic:'rupee'},
+ term:{n:'Term Loan Scheme',cap:5000000,rate:6.5,mor:6,ten:'Up to 10 years',tenY:5,step:10000,desc:'Larger loans for equipment, livestock, vehicles and workspace.',docs:'Aadhaar, caste and income certificate, project report, quotations',ic:'file'},
+ edu:{n:'Educational Loan Scheme',cap:1000000,rate:6.5,mor:12,ten:'Up to 7 years',tenY:5,step:10000,desc:'Course fees for higher studies. Not linked to a business.',docs:'Aadhaar, caste and income certificate, admission letter',ic:'grad'}
+};
+const STATES={Haryana:['Palwal','Faridabad','Gurugram','Rewari','Hisar'],Punjab:['Ludhiana','Amritsar','Patiala'],'Uttar Pradesh':['Agra','Meerut','Lucknow'],Rajasthan:['Jaipur','Alwar','Kota'],Delhi:['South Delhi','North Delhi'],Bihar:['Patna','Gaya']};
+const ACT={
+ biz:[['Kirana / General store','shop'],['Tailoring','scissors'],['Food stall / Dhaba','utensils'],['E-rickshaw / Transport','zap'],['Small workshop','wrench'],['Other','plus']],
+ agri:[['Dairy','milk'],['Poultry','bird'],['Goat / Sheep farming','sheep'],['Fisheries','fish'],['Farm equipment','tractor'],['Other','plus']]
+};
+const EDU=['e1','e2','e3','e4'];
+const PARTNERS=[
+ {id:1,n:'Palwal District Channelizing Office',type:'sca',tl:'State Channelizing Agency',km:3.2,addr:'Civil Lines, Palwal',h:'Micro Finance, Term Loan',hr:'Mon–Sat, 10:00–17:00',st:'ok',x:46,y:38},
+ {id:2,n:'Bank of Bharat, Palwal Main',type:'psb',tl:'Public Sector Bank',km:4.8,addr:'Station Road, Palwal',h:'Micro Finance, Term Loan',hr:'Mon–Sat, 10:00–16:00',st:'ok',x:59,y:60,},
+ {id:3,n:'Sarva Gramin Bank, Hathin',type:'rrb',tl:'Regional Rural Bank',km:12.4,addr:'Main Market, Hathin',h:'Term Loan',hr:'Mon–Fri, 10:00–16:00',st:'warn',x:80,y:26},
+ {id:4,n:'Jan Vikas Micro Finance',type:'nbfc',tl:'NBFC-MFI',km:7.1,addr:'Mandi Road, Palwal',h:'Micro Finance',hr:'Mon–Sat, 09:30–17:30',st:'bad',x:29,y:68},
+ {id:5,n:'Uday Finserv, Hodal',type:'nbfc',tl:'NBFC-MFI',km:18.6,addr:'Bus Stand Road, Hodal',h:'Micro Finance',hr:'Mon–Sat, 10:00–17:00',st:'ok',x:15,y:20}
+];
+const DOCS=['Aadhaar card','Caste certificate','Income certificate','Project report','Bank passbook','Passport photo'];
+
+/* ---------- state ---------- */
+const S={cat:'biz',name:'',mobile:'',state:'Haryana',district:'Palwal',income:3,edu:1,act:'Tailoring',biz:0,cost:150000,emp:2,land:'',noland:false,existing:'',
+ scheme:'micro',best:'micro',amt:135000,rate:6.5,ten:3,mor:3,cmp:[],res:'ok',partner:null,ptype:'all',dist:25,zoom:1,docs:[1,1,1,0,1,0],matched:false,submitted:false};
+const defaults={biz:{act:'Tailoring',cost:150000,income:3,ex:''},agri:{act:'Dairy',cost:400000,income:2.5,ex:'4 buffaloes'}};
+
+/* ---------- routing ---------- */
+function route(){
+  const h=(location.hash||'#/1').split('/');const r=h[1]||'1';
+  if(!['1','2','3','4'].includes(r)){return}
+  $$('.page').forEach(p=>p.classList.toggle('on',p.id==='p'+r));
+  $$('nav.main a').forEach(a=>a.classList.toggle('on',a.dataset.r===r||(r==='4'&&h[2]==='track'&&a.dataset.r==='4t')));
+  $('#nav').classList.remove('open');closeEmi();
+  if(r==='3'){if(!S.matched)runMatch(true);else renderResults()}
+  if(r==='4'){renderP4()}
+  if(h[2]==='track'){setTimeout(()=>$('#tracker').scrollIntoView({behavior:'smooth'}),60)}else window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',route);
+
+/* ---------- page 2 ---------- */
+function setCat(c,reset=true){
+  S.cat=c;document.body.dataset.cat=c;
+  if(reset){const d=defaults[c];S.act=d.act;S.cost=d.cost;S.income=d.income;S.existing=d.ex;S.matched=false;}
+  $$('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.cat===c));
+  $('#catBiz').classList.toggle('sel',c==='biz');$('#catAgri').classList.toggle('sel',c==='agri');
+  $$('.only-biz').forEach(e=>e.style.display=c==='biz'?'':'none');
+  $$('.only-agri').forEach(e=>e.style.display=c==='agri'?'':'none');
+  renderForm();
+}
+function renderForm(){
+  $('#eduTiles').innerHTML=EDU.map((k,i)=>`<button class="tile ${S.edu===i?'on':''}" data-act="edu" data-i="${i}">${t(k)}</button>`).join('');
+  const tl=(c,el)=>{$(el).innerHTML=ACT[c].map(([n,i])=>`<button class="tile ${S.act===n?'on':''}" data-act="act" data-n="${n}"><i class="ic">${ic(i)}</i>${n}</button>`).join('')};
+  tl('biz','#tilesBiz');tl('agri','#tilesAgri');
+  $('#pillsBiz').innerHTML=['New','Existing'].map((n,i)=>`<button class="pillb ${S.biz===i?'on':''}" data-act="biznew" data-i="${i}">${n}</button>`).join('');
+  $('#f_name').value=S.name;$('#f_mob').value=S.mobile;$('#f_land').value=S.land;$('#f_exist').value=S.existing;$('#f_noland').checked=S.noland;
+  $('#f_state').innerHTML=Object.keys(STATES).map(s=>`<option ${s===S.state?'selected':''}>${s}</option>`).join('');
+  fillDist();
+  $('#f_inc').value=S.income;$('#f_cost').value=S.cost?ind(S.cost):'';
+  $('#costHelp').textContent='Example: '+(S.cat==='biz'?'1,50,000':'4,00,000');
+  $('#empVal').textContent=S.emp;
+  upInc();upPrev();upProg();
+}
+function fillDist(){const d=STATES[S.state];if(!d.includes(S.district))S.district=d[0];$('#f_dist').innerHTML=d.map(s=>`<option ${s===S.district?'selected':''}>${s}</option>`).join('')}
+function upInc(){
+  const v=S.income;$('#incVal').textContent='₹'+v+' lakh';
+  const ok=v<=5;const st=$('#incStatus');st.className='status '+(ok?'ok':'bad');
+  st.innerHTML=`<i class="ic">${ic(ok?'check':'alert')}</i>${t(ok?'inc_ok':'inc_bad')}`;
+  const e=$('#incErr');e.textContent=t('inc_err');e.classList.toggle('show',!ok);
+}
+function upPrev(){$('#prevAmt').textContent=fmt(S.cost*.9)}
+function upProg(){
+  const a=S.name.trim().length>1&&S.mobile.length===10;const step=S.submitted?3:(a?2:1);
+  const L=['Your details','Your requirement','Review'];
+  $('#prog').innerHTML=L.map((l,i)=>`<div class="${i+1===step?'on':(i+1<step?'done':'')}">${i+1===step?`Step ${step} of 3: `:''}${l}</div>`).join('');
+}
+function fstate(s){
+  if(s==='empty'){Object.assign(S,{name:'',mobile:'',cost:0,income:3,land:'',existing:'',noland:false});$('#costErr').classList.remove('show')}
+  if(s==='filled'){const d=defaults[S.cat];Object.assign(S,{name:'Sunita Devi',mobile:'9876543210',cost:d.cost,income:d.income,act:d.act,existing:d.ex,land:S.cat==='agri'?'1.5':''})}
+  if(s==='error'){S.income=6.5;S.name=S.name||'Sunita Devi';S.mobile=S.mobile||'9876543210';if(!S.cost)S.cost=defaults[S.cat].cost}
+  renderForm();
+}
+
+/* ---------- matching / page 3 ---------- */
+function runMatch(fromForm){
+  S.matched=true;
+  const loan=S.cost*.9;S.best=loan<=140000?'micro':'term';
+  S.scheme=S.best;const sc=SC[S.best];
+  S.amt=Math.max(sc.step,Math.min(Math.round(loan/1000)*1000,sc.cap));S.rate=6.5;S.ten=sc.tenY;S.mor=sc.mor;S.cmp=[];
+  S.res='loading';renderResults();
+  setTimeout(()=>{S.res='ok';renderResults()},900);
+}
+function sumbar(){
+  $('#sumbar').innerHTML=`<span class="chip" style="background:var(--accent-t);border-color:var(--accent)">${S.act}</span><span class="chip">${fmt(S.cost)}</span><span class="chip">Income ₹${S.income} lakh</span><span class="chip">${S.district}, ${S.state}</span><a href="#/2" class="link" style="display:inline-flex;align-items:center;gap:4px"><i class="ic" style="width:18px;height:18px">${ic('edit')}</i>Edit</a>`;
+}
+function ring(v){const c=2*Math.PI*30;return `<div class="ring"><svg width="76" height="76" viewBox="0 0 76 76"><circle cx="38" cy="38" r="30" fill="none" stroke="var(--line)" stroke-width="8"/><circle cx="38" cy="38" r="30" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${c*v/100} ${c}"/></svg><b>${v}%</b></div>`}
+function card(k,type,score,i){
+  const s=SC[k];const loan=S.cost*.9;
+  const info=`<div class="info3"><div><small>${t('max_loan')}</small><b>${fmtL(s.cap)}</b></div><div><small>${t('interest')}</small><b>${s.rate}% p.a.</b></div><div><small>Moratorium</small><b>${s.mor} months</b></div></div>`;
+  const cmp=`<label class="cmp"><input type="checkbox" data-act="cmpchk" data-k="${k}" ${S.cmp.includes(k)?'checked':''}> Compare</label>`;
+  if(type==='best'){
+    const why=k==='micro'?[`Family income ₹${S.income} lakh is within ₹5 lakh`,`Loan of ${fmt(Math.min(loan,s.cap))} is within this scheme's ${fmtL(s.cap)} limit`,`${S.act} is a covered activity`]:[`Family income ₹${S.income} lakh is within ₹5 lakh`,`Project cost ${fmt(S.cost)} fits this scheme (up to ${fmtL(s.cap)})`,`${S.act} is a covered activity`];
+    return `<article class="scheme best ${S.scheme===k?'picked':''}"><span class="ribbon">${S.res==='empty'?'Closest match':t('best_match')}</span>
+      <div class="sh"><div><h3>${s.n}</h3><p class="muted" style="margin-top:4px">${s.desc}</p></div>${ring(S.res==='empty'?61:score)}</div>${info}
+      <h4 style="margin-bottom:10px;font-size:16px">${t('why_elig')}</h4><ul class="elig">${why.map(w=>`<li><i class="ic">${ic('check')}</i><span>${w}</span></li>`).join('')}</ul>
+      <div class="scr"><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-accent" data-act="usescheme" data-k="${k}">${t('use_scheme')}</button><button class="btn btn-ghost" data-act="details" data-k="${k}">${t('view_details')}</button></div>${cmp}</div></article>`;
+  }
+  const grey=k==='edu';
+  return `<article class="scheme ${grey?'grey':''} ${S.scheme===k?'picked':''}"><div class="sh"><div>${grey?'<span class="tagx">Not needed for your profile</span>':''}<h3>${s.n}</h3><p class="muted" style="margin-top:4px">${s.desc}</p></div>${ring(score)}</div>${info}
+   <div class="scr"><div style="display:flex;gap:10px;flex-wrap:wrap">${grey?'':`<button class="btn btn-ghost btn-sm" data-act="usescheme" data-k="${k}">${t('use_scheme')}</button>`}<button class="btn btn-ghost btn-sm" data-act="details" data-k="${k}">${t('view_details')}</button></div>${cmp}</div></article>`;
+}
+function renderResults(){
+  sumbar();const L=$('#schemeList');
+  if(S.res==='loading'){L.innerHTML=`<div class="loadtxt"><span class="spin"></span>Matching schemes for you...</div><div class="skel"></div><div class="skel" style="height:150px"></div>`;$('#cmpbar').classList.remove('show');return}
+  const other=S.best==='micro'?'term':'micro';
+  let h='';
+  if(S.res==='empty')h+=`<div class="notice">No exact match found, here are the closest schemes.</div>`;
+  h+=card(S.best,'best',94)+card(other,'n',72)+card('edu','n',58);
+  L.innerHTML=h;cmpBar();emiInit();
+}
+function cmpBar(){const b=$('#cmpbar'),n=S.cmp.length;b.classList.toggle('show',n>0);$('#cmpTxt').textContent=`Compare selected (${n})`;b.querySelector('button').disabled=n<2}
+function emiInit(){
+  const s=SC[S.scheme];const r=$('#e_amtR');r.min=s.step;r.max=s.cap;r.step=s.step;
+  S.amt=Math.max(s.step,Math.min(S.amt,s.cap));r.value=S.amt;$('#e_amt').value=ind(S.amt);
+  $('#e_cap').textContent=`${s.n}: up to ${fmtL(s.cap)}`;
+  $('#e_rate').value=S.rate;$('#e_ten').value=S.ten;
+  $('#mors').innerHTML=[3,6,9,12].map(m=>`<button class="${S.mor===m?'on':''}" data-act="mor" data-m="${m}">${m} mo</button>`).join('');
+  emiCalc();
+}
+function emiCalc(){
+  const P=S.amt,r=S.rate/1200,n=S.ten*12;
+  const emi=P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);const pay=emi*n,int=pay-P;
+  $('#e_rateV').textContent=S.rate+'% p.a.';$('#e_tenV').textContent=S.ten+(S.ten>1?' years':' year');
+  $('#o_emi').textContent=fmt(emi);$('#o_int').textContent=fmt(int);$('#o_pay').textContent=fmt(pay);
+  const C=2*Math.PI*46;$('#dnP').setAttribute('stroke-dasharray',`${C*P/pay} ${C}`);
+  $('#l_p').textContent=fmt(P);$('#l_i').textContent=fmt(int);
+  let bal=P,rows='';
+  for(let m=1;m<=Math.min(6,n);m++){const i=bal*r,pr=emi-i;bal-=pr;rows+=`<tr><td>${m+S.mor}</td><td>${ind(emi)}</td><td>${ind(pr)}</td><td>${ind(i)}</td><td>${ind(Math.max(bal,0))}</td></tr>`}
+  $('#schedB').innerHTML=rows;
+  $('#morNote').textContent=`First EMI starts after your ${S.mor}-month moratorium. Month numbers count from loan start.`;
+  S.emi=emi;
+}
+function openEmi(){$('#emiPanel').classList.add('open')}function closeEmi(){$('#emiPanel').classList.remove('open')}
+
+/* ---------- page 4 ---------- */
+function renderP4(){
+  $('#p4h').textContent=`Nearest partners for your ${SC[S.scheme==='edu'?'micro':S.scheme].n}`;
+  const T=[['all','All'],['sca','State Agency'],['psb','Public Sector Bank'],['rrb','Regional Rural Bank'],['nbfc','NBFC-MFI']];
+  $('#ptypes').innerHTML=T.map(([k,l])=>`<button class="fchip ${S.ptype===k?'on':''}" data-act="ptype" data-k="${k}">${l}</button>`).join('');
+  const rank={ok:0,warn:1,bad:2};
+  const list=PARTNERS.filter(p=>(S.ptype==='all'||p.type===S.ptype)&&p.km<=S.dist).sort((a,b)=>rank[a.st]-rank[b.st]||a.km-b.km);
+  $('#pcount').textContent=`${list.length} partner${list.length===1?'':'s'} within ${S.dist} km · Best match first`;
+  const B={ok:['ok','check','funds'],warn:['warn','clock','limited'],bad:['bad','alert','overdue']};
+  $('#plist').innerHTML=list.length?list.map(p=>{const b=B[p.st];return `<article class="pc ${p.st==='bad'?'bad':''} ${S.partner===p.id?'sel':''}" data-id="${p.id}"><div class="ph"><span class="num">${p.id}</span><div style="flex:1"><h4>${p.n}</h4><span class="tag">${p.tl}</span></div><span class="km">${p.km} km</span></div>
+    <p>${p.addr}</p><p><b style="color:var(--ink)">Handles:</b> ${p.h}</p><p>${p.hr}</p>
+    <span class="badge ${b[0]}"><i class="ic" style="width:16px;height:16px">${ic(b[1])}</i>${t(b[2])}</span>
+    ${p.st==='bad'?'<p style="font-size:14px">Why: 38% of past loans overdue (sample data). Apply is disabled.</p>':''}
+    <div class="acts"><button class="btn btn-ghost btn-sm" data-act="dir" data-id="${p.id}"><i class="ic" style="width:18px;height:18px">${ic('nav')}</i>${t('directions')}</button><button class="btn btn-accent btn-sm" data-act="selp" data-id="${p.id}" ${p.st==='bad'?'disabled title="High overdue: not recommended"':''}>${t('select')}</button></div></article>`}).join(''):`<div class="card muted">No partners in this range. Try a larger distance.</div>`;
+  const sel=list.find(p=>p.id===S.partner);
+  $('#pins').innerHTML=`<span class="you" style="left:50%;top:50%" title="You are here"></span>`+list.map(p=>`<button class="pin ${p.st==='bad'?'bad':''} ${S.partner===p.id?'sel':''}" style="left:${p.x}%;top:${p.y}%" data-act="pinp" data-id="${p.id}" aria-label="${p.n}, ${p.km} km"><span><b>${p.id}</b></span></button>`).join('')+(sel?`<div class="pop" style="left:${sel.x}%;top:${sel.y}%"><b>${sel.n}</b>${sel.km} km · ${sel.tl}</div>`:'');
+  renderApply();renderTrk();
+}
+function renderApply(){
+  const A=$('#applyPanel');const p=PARTNERS.find(x=>x.id===S.partner);
+  if(!p){A.style.display='none';return}
+  A.style.display='';const n=S.docs.filter(Boolean).length;
+  A.innerHTML=`<div class="split" style="grid-template-columns:1fr 1fr;gap:32px"><div><span class="tag">${p.tl}</span><h3 style="margin:10px 0 6px">${p.n}</h3><p class="muted">${p.addr} · ${p.km} km · ${p.hr}</p>
+   <p style="margin-top:14px">Scheme: <b>${SC[S.scheme==='edu'?'micro':S.scheme].n}</b><br>Loan: <b>${fmt(S.amt)}</b> · EMI about <b>${fmt(S.emi||0)}</b> for ${S.ten} years</p>
+   <div class="drop" id="drop" tabindex="0" role="button"><i class="ic" style="width:30px;height:30px">${ic('upload')}</i><div style="font-weight:600;color:var(--ink);margin-top:6px">Drag and drop files here</div><div style="font-size:14px">or tap to upload the next pending document</div></div></div>
+   <div><h3 style="margin-bottom:6px">${t('docs_title')}</h3><div class="bar"><i style="width:${n/6*100}%"></i></div><p class="muted" style="font-size:14px;margin-bottom:6px">${n} of 6 ready</p>
+   ${DOCS.map((d,i)=>`<label class="doc"><input type="checkbox" data-act="doc" data-i="${i}" ${S.docs[i]?'checked':''}><span class="n">${d}</span><span class="up ${S.docs[i]?'y':'n'}">${S.docs[i]?'Uploaded':'Pending'}</span></label>`).join('')}
+   <button class="btn btn-accent" style="width:100%;margin-top:18px" data-act="submit" ${n<6?'disabled':''}>${t('submit_app')}</button>
+   ${n<6?'<p class="helper" style="text-align:center">Mark all 6 documents as ready to submit.</p>':''}</div></div>`;
+  const d=$('#drop');
+  const nextDoc=()=>{const i=S.docs.indexOf(0);if(i>-1){S.docs[i]=1;renderApply();toast(DOCS[i]+' uploaded (sample)')}};
+  d.onclick=nextDoc;d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();nextDoc()}};
+  d.ondragover=e=>{e.preventDefault();d.classList.add('over')};d.ondragleave=()=>d.classList.remove('over');d.ondrop=e=>{e.preventDefault();nextDoc()};
+}
+function renderTrk(){
+  const p=PARTNERS.find(x=>x.id===S.partner)||PARTNERS[0];
+  const steps=[['14 Sep','Profile created'],['14 Sep','Income within limit'],['15 Sep',SC[S.scheme==='edu'?'micro':S.scheme].n],['15 Sep','EMI '+fmt(S.emi||4137)],['16 Sep',p.n.split(',')[0]],['18 Sep','SS-2026-004182'],['21 Sep','Documents being checked'],['Pending','After verification']];
+  $('#trk').innerHTML=steps.map((s,i)=>{const c=i<6?'done':i===6?'cur':'pend';return `<li class="${c}"><span class="c">${i<6?ic('check').replace('<svg','<svg width="20" height="20" style="stroke:#fff;fill:none;stroke-width:2.5"'):i+1}</span><div><b>${t('tr'+(i+1))}</b><small>${s[0]}<br>${s[1]}</small></div></li>`}).join('');
+  $('#smsTxt').textContent=`Your application SS-2026-004182 is now under verification at ${p.n}.`;
+}
+function modal(html){$('#modBody').innerHTML=html;$('#mod').classList.add('show');paintIcons($('#mod'))}
+function closeMod(){$('#mod').classList.remove('show')}
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+  switch(a){
+    case 'help':modal(`<h2 style="margin-bottom:10px">Need a hand?</h2><p class="muted" style="margin-bottom:16px">A SchemeSetu helper can fill the form with you in Hindi, Punjabi or English.</p><p style="font-size:26px;font-weight:700;margin-bottom:18px">1800-000-0000</p><button class="btn btn-primary" data-act="closemod"><i class="ic" data-ic="phone"></i>Request a call back</button>`);break;
+    case 'closemod':closeMod();if(b.textContent.includes('call back'))toast('Call back requested (sample)');break;
+    case 'scrollcats':e.preventDefault();$('#cats').scrollIntoView({behavior:'smooth'});break;
+    case 'pickcat':setCat(b.dataset.cat);location.hash='#/2';break;
+    case 'segcat':setCat(b.dataset.cat);break;
+    case 'otp':S.mobile.length===10?toast('OTP sent to +91 '+S.mobile+' (sample)'):toast('Enter a 10-digit mobile number first');break;
+    case 'edu':S.edu=+b.dataset.i;renderForm();break;
+    case 'act':S.act=b.dataset.n;renderForm();break;
+    case 'biznew':S.biz=+b.dataset.i;renderForm();break;
+    case 'emp':S.emp=Math.max(0,Math.min(50,S.emp+ +b.dataset.d));$('#empVal').textContent=S.emp;break;
+    case 'fstate':fstate(b.dataset.s);break;
+    case 'find':{
+      let bad=false;
+      if(S.income>5){$('#incErr').classList.add('show');$('#f_inc').scrollIntoView({behavior:'smooth',block:'center'});bad=true}
+      if(!S.cost){$('#costErr').classList.add('show');$('#f_cost').classList.add('bad');if(!bad)$('#f_cost').scrollIntoView({behavior:'smooth',block:'center'});bad=true}
+      if(bad)return;S.matched=false;S.submitted=false;location.hash='#/3';break}
+    case 'rstate':if(b.dataset.s==='loading'){S.res='loading';renderResults();setTimeout(()=>{S.res='ok';renderResults()},1200)}else{S.res=b.dataset.s;renderResults()}break;
+    case 'usescheme':S.scheme=b.dataset.k;const sc=SC[S.scheme];S.mor=sc.mor;S.rate=6.5;S.amt=Math.min(Math.round(S.cost*.9/1000)*1000,sc.cap);renderResults();toast(sc.n+' selected');if(innerWidth<=960)openEmi();break;
+    case 'details':{const s=SC[b.dataset.k];modal(`<h2 style="margin-bottom:6px">${s.n}</h2><p class="muted" style="margin-bottom:14px">${s.desc}</p><table class="t cmpt"><tr><th>Max loan</th><td>${fmtL(s.cap)}</td></tr><tr><th>Interest</th><td>${s.rate}% to 15% p.a. (concessional rate ${s.rate}%)</td></tr><tr><th>Moratorium</th><td>3 to 12 months (typical ${s.mor})</td></tr><tr><th>Tenure</th><td>${s.ten}</td></tr><tr><th>Documents</th><td>${s.docs}</td></tr></table>`);break}
+    case 'opencmp':{const ks=S.cmp;const rows=[['Max loan',k=>fmtL(SC[k].cap)],['Interest',k=>SC[k].rate+'% p.a.'],['Moratorium',k=>SC[k].mor+' months'],['Tenure',k=>SC[k].ten],['Documents needed',k=>SC[k].docs]];
+      modal(`<h2 style="margin-bottom:14px">Compare schemes</h2><div class="tscroll"><table class="t cmpt"><thead><tr><th></th>${ks.map(k=>`<th>${SC[k].n}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr><th>${r[0]}</th>${ks.map(k=>`<td>${r[1](k)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`);break}
+    case 'mor':S.mor=+b.dataset.m;emiInit();break;
+    case 'openemi':openEmi();break;case 'closeemi':closeEmi();break;
+    case 'tofind':closeEmi();break;
+    case 'ptype':S.ptype=b.dataset.k;renderP4();break;
+    case 'selp':case 'pinp':{const p=PARTNERS.find(x=>x.id===+b.dataset.id);if(p.st==='bad'){toast('Not recommended: high overdue rate at this partner');S.partner=null}else S.partner=p.id;renderP4();if(S.partner&&a==='selp')setTimeout(()=>$('#applyPanel').scrollIntoView({behavior:'smooth',block:'start'}),50);break}
+    case 'dir':toast('Opening directions in Maps (sample)');break;
+    case 'locate':toast('Location set to Palwal, Haryana (sample)');break;
+    case 'zoom':S.zoom=Math.max(1,Math.min(2,S.zoom+ +b.dataset.d*.4));$('#mapz').style.setProperty('--z',S.zoom);break;
+    case 'submit':{const p=PARTNERS.find(x=>x.id===S.partner);S.submitted=true;
+      modal(`<div style="text-align:center"><div class="okbig"><i class="ic" data-ic="check"></i></div><h2>Application sent</h2><p class="muted" style="margin:8px 0 6px">Application number</p><p style="font-size:26px;font-weight:700;letter-spacing:.02em">SS-2026-004182</p><p style="margin:12px 0 22px">Your application has been sent to <b>${p.n}</b>.</p><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn btn-accent" data-act="trackst">Track status</button><button class="btn btn-ghost" data-act="dl"><i class="ic" data-ic="download"></i>Download summary</button></div></div>`);break}
+    case 'trackst':closeMod();$('#tracker').scrollIntoView({behavior:'smooth'});break;
+    case 'dl':toast('Summary downloaded (sample)');break;
+    case 'chat':toast('Chat opens here in the full product');break;
+  }
+});
+document.addEventListener('change',e=>{
+  const t2=e.target;
+  if(t2.dataset.act==='cmpchk'){const k=t2.dataset.k;if(t2.checked){if(S.cmp.length>=3){t2.checked=false;return}S.cmp.push(k)}else S.cmp=S.cmp.filter(x=>x!==k);cmpBar()}
+  if(t2.dataset.act==='doc'){S.docs[+t2.dataset.i]=t2.checked?1:0;renderApply()}
+  if(t2.id==='f_noland'){S.noland=t2.checked;$('#f_land').disabled=t2.checked}
+  if(t2.id==='f_state'){S.state=t2.value;fillDist()}
+  if(t2.id==='f_dist')S.district=t2.value;
+  if(t2.id==='distSel'){S.dist=+t2.value;renderP4()}
+  if(t2.id==='lang'){lang=LI[t2.value];applyI18n();renderForm();if(S.matched)renderResults();renderP4()}
+});
+document.addEventListener('input',e=>{
+  const x=e.target;
+  if(x.dataset.f&&['name','land','existing'].includes(x.dataset.f)){S[x.dataset.f]=x.value;upProg()}
+  if(x.dataset.f==='mobile'){x.value=x.value.replace(/\D/g,'');S.mobile=x.value;upProg()}
+  if(x.id==='f_inc'){S.income=+x.value;upInc()}
+  if(x.id==='f_cost'){const d=x.value.replace(/\D/g,'');S.cost=+d||0;x.value=d?ind(+d):'';upPrev();x.classList.remove('bad');$('#costErr').classList.remove('show')}
+  if(x.id==='e_amtR'){S.amt=+x.value;$('#e_amt').value=ind(S.amt);emiCalc()}
+  if(x.id==='e_rate'){S.rate=+x.value;emiCalc()}
+  if(x.id==='e_ten'){S.ten=+x.value;emiCalc()}
+});
+$('#e_amt').addEventListener('change',e=>{const s=SC[S.scheme];const v=+e.target.value.replace(/\D/g,'')||s.step;S.amt=Math.max(s.step,Math.min(v,s.cap));$('#e_amtR').value=S.amt;e.target.value=ind(S.amt);emiCalc()});
+$('#burger').addEventListener('click',()=>$('#nav').classList.toggle('open'));
+$('#mod').addEventListener('click',e=>{if(e.target.id==='mod')closeMod()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMod();closeEmi()}});
+
+/* ---------- boot ---------- */
+paintIcons();applyI18n();setCat('biz');
+route();
+</script>
+</body>
+</html>
